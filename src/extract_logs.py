@@ -1,34 +1,28 @@
 import sys
-import os
 
-def extract_logs(date, log_file, output_dir="output"):
-    """Extract logs for a specific date from a large log file efficiently."""
-    
-    # Ensure the output directory exists
-    os.makedirs(output_dir, exist_ok=True)
+print("Script Started")  # Debugging message
 
-    output_file = os.path.join(output_dir, f"output_{date}.txt")
+if len(sys.argv) != 3:
+    print("Usage: python extract_logs.py <date> <log_file_path>")
+    sys.exit(1)
 
-    try:
-        with open(log_file, "r", encoding="utf-8") as file, open(output_file, "w", encoding="utf-8") as out_file:
-            for line in file:
-                if line.startswith(date):  # Efficient filtering
-                    out_file.write(line)
+date = sys.argv[1]
+log_file_path = sys.argv[2]
 
-        print(f"✅ Logs for {date} saved to {output_file}")
+print(f"Filtering logs for date: {date}")
+print(f"Reading log file: {log_file_path}")
 
-    except FileNotFoundError:
-        print(f"❌ Error: Log file '{log_file}' not found.")
-    except Exception as e:
-        print(f"❌ An error occurred: {e}")
+try:
+    with open(log_file_path, "r") as file:
+        logs = [line for line in file if date in line]
+        print(f"Found {len(logs)} matching logs")  # Debugging message
 
-# ✅ Fixing the typo in the main function
-if __name__ == "_main_":
-    if len(sys.argv) != 3:
-        print("Usage: python extract_logs.py <YYYY-MM-DD> <log_file_path>")
-        sys.exit(1)
+        if logs:
+            with open(f"output/output_{date}.txt", "w") as output_file:
+                output_file.writelines(logs)
+            print(f"Logs saved to output/output_{date}.txt")
+        else:
+            print("No logs found for this date.")
 
-    date_arg = sys.argv[1]  # Input date (YYYY-MM-DD)
-    log_file_path = sys.argv[2]  # Log file path
-
-    extract_logs(date_arg, log_file_path)
+except Exception as e:
+    print(f"Error: {e}")
